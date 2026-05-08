@@ -12,3 +12,21 @@ Encountered multiple TypeScript configuration and import path issues during setu
 
 **Plan for tomorrow:**  
 Finish resolving setup/configuration issues, implement the core audit engine logic, create API endpoints for audit generation, and start building the frontend UI for audit input and results display.
+
+
+
+## Day 2 — 2026-05-08
+**Hours worked:** 
+**What I did:** 
+Built core audit engine with per-tool recommendation logic for Cursor, Claude, 
+GitHub Copilot and ChatGPT. Added TypeScript types for entire data flow. 
+Added pricing constants for all 8 tools sourced from official pricing pages.
+Fixed Git push conflict and resolved TypeScript import path issues from Day 1.
+**What I learned:** 
+Keeping audit logic as pure functions makes it easy to unit test later.
+Separating pricing data from logic means prices can be updated without 
+touching business rules. Git pull --rebase resolves remote conflicts cleanly.
+**Blockers / what I'm stuck on:** 
+**Plan for tomorrow:** 
+Build the spend input form UI with localStorage persistence, 
+build the audit results page with per-tool breakdown cards and hero savings number.
