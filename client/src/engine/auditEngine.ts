@@ -143,6 +143,79 @@ function auditChatGPT(tool: ToolInput, useCase: string): ToolRecommendation {
   }
 }
 
+function auditGemini(tool: ToolInput, useCase: string): ToolRecommendation {
+  const { plan, monthlySpend } = tool
+
+  if (plan === 'pro' && useCase === 'coding') {
+    return {
+      tool: 'gemini',
+      currentSpend: monthlySpend,
+      recommendedAction: 'Switch to Cursor or Windsurf for coding',
+      monthlySavings: monthlySpend - 15,
+      reason: `Gemini Advanced ($20/mo) has no IDE integration. Windsurf Pro ($15/mo) gives AI coding assistance inside your editor at lower cost.`,
+      isOptimal: false
+    }
+  }
+
+  return {
+    tool: 'gemini',
+    currentSpend: monthlySpend,
+    recommendedAction: 'No change needed',
+    monthlySavings: 0,
+    reason: 'Gemini plan fits your use case.',
+    isOptimal: true
+  }
+}
+
+function auditWindsurf(tool: ToolInput): ToolRecommendation {
+  const { plan, monthlySpend, seats } = tool
+
+  if (plan === 'team' && seats <= 2) {
+    return {
+      tool: 'windsurf',
+      currentSpend: monthlySpend,
+      recommendedAction: 'Switch to individual Pro plans',
+      monthlySavings: monthlySpend - (15 * seats),
+      reason: `Windsurf Team ($35/seat) is for larger teams. ${seats} user(s) on Pro ($15/seat) saves $${monthlySpend - (15 * seats)}/mo.`,
+      isOptimal: false
+    }
+  }
+
+  return {
+    tool: 'windsurf',
+    currentSpend: monthlySpend,
+    recommendedAction: 'No change needed',
+    monthlySavings: 0,
+    reason: 'Windsurf plan is right for your team size.',
+    isOptimal: true
+  }
+}
+
+function auditAPI(tool: ToolInput): ToolRecommendation {
+  const { monthlySpend } = tool
+  const name = tool.tool === 'anthropic_api' ? 'Anthropic' : 'OpenAI'
+
+  if (monthlySpend > 500) {
+    return {
+      tool: tool.tool,
+      currentSpend: monthlySpend,
+      recommendedAction: 'Consider pre-purchasing credits via Credex',
+      monthlySavings: Math.round(monthlySpend * 0.2),
+      reason: `At $${monthlySpend}/mo on ${name} API, buying discounted credits in bulk can save ~20%. Credex sources unused credits at below-retail pricing.`,
+      isOptimal: false
+    }
+  }
+
+  return {
+    tool: tool.tool,
+    currentSpend: monthlySpend,
+    recommendedAction: 'No change needed',
+    monthlySavings: 0,
+    reason: `${name} API spend is within normal range. Monitor monthly usage to catch unexpected spikes.`,
+    isOptimal: true
+  }
+}
+
 export function runAudit(formData: AuditFormData): AuditResult {
   const recommendations: ToolRecommendation[] = []
 
@@ -163,6 +236,16 @@ export function runAudit(formData: AuditFormData): AuditResult {
         break
       case 'chatgpt':
         rec = auditChatGPT(tool, formData.useCase)
+        break
+      case 'gemini':
+        rec = auditGemini(tool, formData.useCase)
+        break
+      case 'windsurf':
+        rec = auditWindsurf(tool)
+        break
+      case 'anthropic_api':
+      case 'openai_api':
+        rec = auditAPI(tool)
         break
       default:
         rec = {
