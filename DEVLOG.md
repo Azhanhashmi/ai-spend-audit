@@ -38,3 +38,17 @@ touching business rules. Git pull --rebase resolves remote conflicts cleanly.
 
 Build the spend input form UI with localStorage persistence, 
 build the audit results page with per-tool breakdown cards and hero savings number.
+
+## Day 3 — 2026-05-09
+
+**Hours worked:** 
+
+**What I did:** 
+Built full frontend UI — spend input form with localStorage 
+persistence, results page with per-tool breakdown cards and hero savings display. 
+Connected audit engine to UI. App now works end-to-end on the frontend.
+
+**What I learned:** 
+**Blockers / what I'm stuck on:** 
+**Plan for tomorrow:** Connect backend API, add MongoDB storage, 
+build shareable URL feature, add lead capture email modal.
