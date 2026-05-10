@@ -52,3 +52,14 @@ Connected audit engine to UI. App now works end-to-end on the frontend.
 **Blockers / what I'm stuck on:** 
 **Plan for tomorrow:** Connect backend API, add MongoDB storage, 
 build shareable URL feature, add lead capture email modal.
+
+## Day 4 — 2026-05-10
+**Hours worked:**
+**What I did:** Connected MongoDB Atlas, implemented audit and lead controllers,
+wired frontend to save audits to DB and get unique IDs back.
+Built lead capture modal. Shareable URL now uses real audit ID from DB.
+Filled PRICING_DATA.md with verified URLs.
+**What I learned:**
+**Blockers / what I'm stuck on:**
+**Plan for tomorrow:** AI summary via Anthropic API, write 5 tests,
+set up GitHub Actions CI, start deployment to Vercel.

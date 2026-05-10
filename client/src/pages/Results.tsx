@@ -8,6 +8,7 @@ export default function Results() {
   const navigate = useNavigate()
   const [result, setResult] = useState<AuditResult | null>(null)
   const [copied, setCopied] = useState(false)
+  const [auditId, setAuditId] = useState<string | null>(null)
 
   useEffect(() => {
     const saved = localStorage.getItem('audit_result')
