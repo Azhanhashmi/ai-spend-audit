@@ -41,7 +41,7 @@ export default function Results() {
     try {
       setLoadingSummary(true)
 
-      const res = await fetch('/api/audit', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/audit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
