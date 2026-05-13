@@ -20,6 +20,4 @@ app.use('/api/audit', auditRoutes)
 app.use('/api/lead', leadRoutes)
 app.use(errorHandler)
 
-app.listen(process.env.PORT || 5000, () => {
-  console.log(`Server running on port ${process.env.PORT}`)
-})
+export default app
