@@ -63,3 +63,12 @@ Filled PRICING_DATA.md with verified URLs.
 **Blockers / what I'm stuck on:**
 **Plan for tomorrow:** AI summary via Anthropic API, write 5 tests,
 set up GitHub Actions CI, start deployment to Vercel.
+## Day 5 — 2026-05-13
+What I did:
+Integrated AI summary generation using Groq API by connecting API keys securely through environment variables. Fixed backend configuration issues related to missing .env variables and improved server initialization order. Worked on refining the audit engine output structure and ensured recommendations, savings calculations, and AI-generated summaries are correctly passed from backend to frontend. Debugged multiple TypeScript and runtime issues across the audit flow and improved stability of the end-to-end system. Verified that audit results are now properly generated and displayed in the UI with savings breakdown and AI summary section.
+What I learned:
+Learned how environment variable initialization order impacts Node.js services, especially when external SDK clients are instantiated too early. Gained deeper understanding of API integration flow between backend services and frontend state handling. Improved debugging skills for full-stack data flow issues where backend outputs do not match frontend expectations. Understood importance of consistent data contracts between engine → API → UI layers.
+Blockers / what I'm stuck on:
+Faced issues with missing GROQ_API_KEY causing backend crashes and incorrect initialization of the Groq client. Also encountered mismatches between audit engine output structure and frontend expectations, leading to incorrect or zero savings display initially.
+Plan for tomorrow:
+Complete AI summary polish (better prompts and structured output), add CI tests for API + audit engine, improve UI accuracy for savings display, and start deployment preparation (Vercel + backend hosting).

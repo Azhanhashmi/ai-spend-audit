@@ -1,15 +1,26 @@
 import { Request, Response } from 'express'
 import Audit from '../models/Audit'
+import { generateSummary } from '../services/groq.service'
 
 export const createAudit = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { toolsData, recommendations, totalMonthlySavings, totalAnnualSavings, teamSize, useCase, aiSummary } = req.body
+    const { toolsData, recommendations, totalMonthlySavings, totalAnnualSavings, teamSize, useCase } = req.body
+
+    const aiSummary = await generateSummary({
+      totalMonthlySavings,
+      totalAnnualSavings,
+      recommendations,
+      teamSize,
+      useCase
+    })
+
     const audit = await Audit.create({
       toolsData, recommendations,
       totalMonthlySavings, totalAnnualSavings,
       teamSize, useCase, aiSummary
     })
-    res.status(201).json({ auditId: audit._id, audit })
+
+    res.status(201).json({ auditId: audit._id, audit, aiSummary })
   } catch (err) {
     res.status(500).json({ message: 'Failed to save audit' })
   }

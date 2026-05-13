@@ -6,30 +6,88 @@ import { Starfield } from '../components/ui/starfield'
 
 export default function Results() {
   const navigate = useNavigate()
+
   const [result, setResult] = useState<AuditResult | null>(null)
   const [copied, setCopied] = useState(false)
   const [auditId, setAuditId] = useState<string | null>(null)
+  const [aiSummary, setAiSummary] = useState<string | null>(null)
+  const [teamSize, setTeamSize] = useState<number>(1)
+  const [useCase, setUseCase] = useState<string>('coding')
+  const [loadingSummary, setLoadingSummary] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem('audit_result')
-    if (!saved) { navigate('/'); return }
-    setResult(JSON.parse(saved))
+
+    if (!saved) {
+      navigate('/')
+      return
+    }
+
+    try {
+      const parsed = JSON.parse(saved)
+      setResult(parsed)
+      // teamSize and useCase are saved alongside audit_result
+      setTeamSize(parsed.teamSize ?? 1)
+      setUseCase(parsed.useCase ?? 'coding')
+    } catch (error) {
+      console.error('Failed to parse audit result:', error)
+      navigate('/')
+    }
   }, [navigate])
 
+  async function saveAudit() {
+    if (!result) return
+
+    try {
+      setLoadingSummary(true)
+
+      const res = await fetch('/api/audit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          toolsData: result.recommendations,
+          recommendations: result.recommendations,
+          totalMonthlySavings: result.totalMonthlySavings,
+          totalAnnualSavings: result.totalAnnualSavings,
+          teamSize,
+          useCase,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Failed to save audit')
+
+      const data = await res.json()
+      setAuditId(data.auditId)
+      if (data.aiSummary) setAiSummary(data.aiSummary)
+    } catch (error) {
+      console.error('Failed to save audit:', error)
+    } finally {
+      setLoadingSummary(false)
+    }
+  }
+
   function handleCopy() {
-    navigator.clipboard.writeText(window.location.href)
+    const shareUrl = auditId
+      ? `${window.location.origin}/audit/${auditId}`
+      : window.location.href
+
+    navigator.clipboard.writeText(shareUrl)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!result) return (
-    <div className="min-h-screen bg-black flex items-center justify-center text-white/40 text-sm">
-      Loading...
-    </div>
-  )
+  if (!result) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white/40 text-sm">
+        Loading...
+      </div>
+    )
+  }
 
-  const allOptimal = result.recommendations.every(r => r.isOptimal)
-  const hasNonOptimal = result.recommendations.some(r => !r.isOptimal)
+  const allOptimal = result.recommendations.every((r) => r.isOptimal)
+  const hasNonOptimal = result.recommendations.some((r) => !r.isOptimal)
 
   return (
     <div className="relative min-h-screen bg-black overflow-x-hidden">
@@ -49,7 +107,7 @@ export default function Results() {
           onClick={() => navigate('/')}
           className="text-white/30 hover:text-white/60 text-xs mb-8 flex items-center gap-1.5 transition-colors"
         >
-          Back to audit
+          ← Back to audit
         </button>
 
         {/* Hero */}
@@ -69,6 +127,16 @@ export default function Results() {
           </p>
         </div>
 
+        {/* AI Summary */}
+        {aiSummary && (
+          <div className="bg-white/[0.03] border border-white/8 rounded-2xl p-5 mb-4 backdrop-blur-md">
+            <p className="text-xs font-semibold text-white/25 uppercase tracking-widest mb-2">
+              AI Summary
+            </p>
+            <p className="text-sm text-white/60 leading-relaxed">{aiSummary}</p>
+          </div>
+        )}
+
         {/* Credex CTA */}
         {result.isHighSavings && (
           <div className="bg-indigo-950/40 border border-indigo-500/25 rounded-2xl p-5 mb-4 flex items-center justify-between gap-4 flex-wrap backdrop-blur-md">
@@ -80,8 +148,8 @@ export default function Results() {
                 Get the same AI tools at 20–40% off through Credex.
               </div>
             </div>
-            <a
-              href="https://credex.rocks"
+            
+            <a  href="https://credex.rocks"
               target="_blank"
               rel="noreferrer"
               className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
@@ -103,12 +171,24 @@ export default function Results() {
           </div>
         )}
 
+        {/* Fully optimized */}
+        {allOptimal && (
+          <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-5 mb-4 backdrop-blur-md">
+            <div className="font-semibold text-sm text-emerald-300 mb-1">
+              Your stack is already highly optimized
+            </div>
+            <div className="text-xs text-white/40">
+              Your current tool selection appears cost-efficient based on available pricing data.
+            </div>
+          </div>
+        )}
+
         {/* Breakdown */}
         <p className="text-xs font-semibold text-white/25 uppercase tracking-widest mb-3">
           Breakdown
         </p>
 
-        <div className="space-y-2 mb-4">
+        <div className="space-y-2 mb-6">
           {result.recommendations.map((rec, i) => (
             <div
               key={i}
@@ -127,49 +207,48 @@ export default function Results() {
                   {rec.isOptimal
                     ? 'Optimal'
                     : rec.monthlySavings > 0
-                      ? `Save $${rec.monthlySavings}/mo`
-                      : 'Switch plan'}
+                    ? `Save $${rec.monthlySavings}/mo`
+                    : 'Switch plan'}
                 </span>
               </div>
+
               <div className="text-xs text-white/30 mb-1.5">
                 Current spend: <span className="text-white/50">${rec.currentSpend}/mo</span>
               </div>
+
               <div className="text-xs text-white/60 mb-1">
-                <span className="text-white/25">Action: </span>{rec.recommendedAction}
+                <span className="text-white/25">Action: </span>
+                {rec.recommendedAction}
               </div>
+
+              {/* ✅ fixed: use rec.reason (matches auditEngine output) */}
               <div className="text-xs text-white/35 leading-relaxed">
-                {rec.reason}
+                {rec.reason ?? 'Recommended based on pricing efficiency and usage patterns.'}
               </div>
             </div>
           ))}
         </div>
 
-        {/* All optimal */}
-        {allOptimal && (
-          <div className="bg-emerald-950/30 border border-emerald-500/20 rounded-xl p-4 mb-4 text-emerald-400 text-sm backdrop-blur-md">
-            <strong>You are spending well.</strong> Your AI stack looks optimized.
-          </div>
-        )}
-
-        {/* Action buttons */}
-        <div className="flex gap-2.5">
-          <button
-            onClick={() => navigate('/')}
-            className="flex-1 py-3 rounded-xl bg-white/5 hover:bg-white/8 border border-white/10 text-white/50 hover:text-white/70 text-sm font-medium transition-all"
-          >
-            New Audit
-          </button>
+        {/* Actions */}
+        <div className="flex items-center gap-3 flex-wrap">
           <button
             onClick={handleCopy}
-            className="flex-[2] py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20"
+            className="bg-white/10 hover:bg-white/15 border border-white/10 text-white text-sm px-4 py-2 rounded-lg transition-colors"
           >
-            {copied ? 'Copied!' : 'Share Results'}
+            {copied ? 'Copied!' : 'Copy share link'}
           </button>
+
+          {!auditId && (
+            <button
+              onClick={saveAudit}
+              disabled={loadingSummary}
+              className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors"
+            >
+              {loadingSummary ? 'Generating summary...' : 'Generate AI Summary'}
+            </button>
+          )}
         </div>
 
-        <p className="text-center text-xs text-white/10 mt-6">
-          Powered by Credex · credex.rocks
-        </p>
       </div>
     </div>
   )

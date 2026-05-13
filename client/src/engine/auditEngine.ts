@@ -220,7 +220,17 @@ export function runAudit(formData: AuditFormData): AuditResult {
   const recommendations: ToolRecommendation[] = []
 
   for (const tool of formData.tools) {
-    if (tool.monthlySpend === 0) continue
+    if (!tool.monthlySpend || tool.monthlySpend <= 0) {
+  recommendations.push({
+    tool: tool.tool,
+    currentSpend: 0,
+    recommendedAction: 'No spend data provided',
+    monthlySavings: 0,
+    reason: 'Missing pricing input',
+    isOptimal: true
+  })
+  continue
+}
 
     let rec: ToolRecommendation
 
