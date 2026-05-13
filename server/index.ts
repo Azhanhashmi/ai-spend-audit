@@ -1,11 +1,11 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import { connectDB } from './config/db'
-import { limiter } from './middleware/rateLimit'
-import auditRoutes from './routes/audit.routes'
-import leadRoutes from './routes/lead.routes'
-import { errorHandler } from './middleware/errorHandler'
+import { connectDB } from './src/config/db'
+import { limiter } from './src/middleware/rateLimit'
+import auditRoutes from './src/routes/audit.routes'
+import leadRoutes from './src/routes/lead.routes'
+import { errorHandler } from './src/middleware/errorHandler'
 
 dotenv.config()
 connectDB()
