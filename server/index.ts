@@ -12,6 +12,12 @@ connectDB()
 
 const app = express()
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Backend is running'
+  })
+})
 app.use(cors({ origin: process.env.CLIENT_URL }))
 app.use(express.json())
 app.use(limiter)
