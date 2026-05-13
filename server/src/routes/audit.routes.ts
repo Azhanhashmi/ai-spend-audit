@@ -1,9 +1,12 @@
-import { Router } from 'express'
+import express from 'express'
 import { createAudit, getAudit } from '../controllers/audit.controller'
 
-const router = Router()
+const router = express.Router()
 
-router.post('/', createAudit)       // POST /api/audit
-router.get('/:id', getAudit)        // GET /api/audit/:id  (shareable URL)
+// create audit (POST /api/audit)
+router.post('/', createAudit)
+
+// optional: fetch audit by id (GET /api/audit/:id)
+router.get('/:id', getAudit)
 
 export default router

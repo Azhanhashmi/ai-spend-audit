@@ -1,11 +1,10 @@
 import mongoose from 'mongoose'
 
-export const connectDB = async (): Promise<void> => {
-  try {
-    await mongoose.connect(process.env.MONGODB_URI as string)
-    console.log('MongoDB connected')
-  } catch (error) {
-    console.error('MongoDB connection failed:', error)
-    process.exit(1)
+export const connectDB = async () => {
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI is missing in .env')
   }
+
+  await mongoose.connect(process.env.MONGODB_URI)
+  console.log('MongoDB connected')
 }

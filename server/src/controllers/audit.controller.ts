@@ -21,9 +21,14 @@ export const createAudit = async (req: Request, res: Response): Promise<void> =>
     })
 
     res.status(201).json({ auditId: audit._id, audit, aiSummary })
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to save audit' })
-  }
+  } catch (err: any) {
+  console.error("AUDIT ERROR:", err)
+
+  res.status(500).json({
+    message: 'Failed to save audit',
+    error: err.message
+  })
+}
 }
 
 export const getAudit = async (req: Request, res: Response): Promise<void> => {
